@@ -1,0 +1,25 @@
+(load "./newtype.carp")
+
+(newtype Year Int)
+(newtype Firstname String)
+(newtype Lastname String)
+
+(defn print-nt [nt]
+ (println* (newtype-consume nt)))
+
+(defn add-years [ya yb]
+  (Year (+ (Year.consume ya) (Year.consume yb))))
+
+(defn make-full-name [firstname lastname]
+  (String.concat &[@(Firstname.get firstname) @" " @(Lastname.get lastname)]))
+
+(defn-do main []
+ (print-nt (Year 1999))
+ (print-nt (Firstname @"George"))
+
+ ; Doesn't compile
+ ; (add-years 1999 1)
+
+ (println* (newtype-consume (add-years (Year 1999) (Year 1))))
+ (println* (make-full-name &(Firstname @"Tim") &(Lastname @"Dévé"))))
+

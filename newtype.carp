@@ -1,0 +1,38 @@
+(defmodule Unsafe
+  (defn unsafe-deref [r]
+    (Pointer.to-value
+      (the (Ptr a)
+           (Unsafe.coerce (the (Ref a) r))))))
+
+(definterface newtype-consume (Fn [(n a)] a))
+(definterface newtype-get (Fn [(Ref (n a) lt)] (Ref a lt)))
+
+; (deftype (NewType Int) [get Int])
+; (defmodule NewType
+;   (sig consume (Fn [(NewType Int)] Int))
+;   (defn consume [newtype]
+;     (let [val (Unsafe.unsafe-deref (NewType.get &newtype))
+;           _   (Unsafe.leak newtype)]
+;       val))
+;   (implements newtype-consume NewType.consume)
+;
+;   (sig get (Fn [(Ref (NewType Int) lt)] (Ref Int lt)))
+;   (defn get [newtype] (NewType.get newtype))
+;   (implements newtype-get NewType.get))
+
+(defmacro newtype [name ty]
+ (do
+   (eval (list 'deftype (list name ty)
+                        (array 'get ty)))
+   (eval
+     (list 'defmodule name
+      (list 'sig 'consume (list 'Fn (array (list name ty)) ty))
+      (list 'defn 'consume (array 'newtype)
+        (list 'let (array 'val (list 'Unsafe.unsafe-deref (list (Symbol.prefix name 'get) (list 'ref 'newtype)))
+                          '_   (list 'Unsafe.leak 'newtype))
+              'val))
+      (list 'implements 'newtype-consume (Symbol.prefix name 'consume))
+
+      (list 'sig 'get (list 'Fn (array (list (list name ty) 'lt)) (list 'Ref ty 'lt)))
+      (list 'implements 'newtype-get (Symbol.prefix name 'get))))))
+
