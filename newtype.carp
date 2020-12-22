@@ -19,7 +19,7 @@
                 _   (Unsafe.leak newtype)]
             val))
 
-        (defn update [newtype val] (update-get newtype val))
+        (defn update [newtype f] (update-get newtype f))
 
         (private update-get)
         (hidden update-get)

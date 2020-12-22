@@ -10,10 +10,14 @@
 (defn make-full-name [firstname lastname]
   (String.concat &[@(Firstname.get firstname) @" " @(Lastname.get lastname)]))
 
+(defn next-year [year]
+ (Year.update year &inc))
+
 (defn-do main []
  ; Doesn't compile
  ; (add-years 1999 1)
 
- (println* (Year.consume (add-years (Year 1999) (Year 1))))
+ (println* (Year.consume (add-years (Year 1992) (Year 28))))
+ (println* (Year.consume (next-year (Year 1999))))
  (println* (make-full-name &(Firstname @"Tim") &(Lastname @"Dévé"))))
 
