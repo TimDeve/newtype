@@ -1,21 +1,14 @@
-(defmodule Unsafe
-  (sig unsafe-deref (Fn [(Ref a)] a))
-  (defn unsafe-deref [r]
-    (Pointer.to-value (Unsafe.coerce r))))
-
-(defndynamic parse-eval [:rest strs] (eval (parse (String.concat (eval (cons 'array strs))))))
-
-(defmacro newtype [-name -ty]
- (let [name (str -name) ty (str -ty)]
+(defmacro newtype [name ty]
   (do
-   (parse-eval
-     "(deftype "name" [get "ty"])")
+   (eval
+     `(deftype %name [get %ty]))
 
-   (parse-eval
-     "(defmodule "name"
-        (sig consume (Fn ["name"] "ty"))
+   (eval
+     `(defmodule %name
+        (sig consume (Fn [%name] %ty))
         (defn consume [newtype]
-          (let [val (Unsafe.unsafe-deref ("name".get &newtype))
+          (let [reff (%(Symbol.prefix name 'get) &newtype)
+                val (the %ty (Pointer.to-value (Unsafe.coerce reff)))
                 _   (Unsafe.leak newtype)]
             val))
 
@@ -28,4 +21,4 @@
         (hidden set-get)
 
         (private set-get!)
-        (hidden set-get!))"))))
+        (hidden set-get!)))))

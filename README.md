@@ -11,8 +11,8 @@ Newtypes for [Carp](https://www.github.com/carp-lang/carp)
   (Year (+ (Year.consume ya) (Year.consume yb))))
 
 (defn-do main []
- (println* (newtype-consume (add-years (Year 1999) (Year 1)))))
+ (println* &(add-years (Year 1999) (Year 1))))
 
  ; Doesn't compile
- ; (println* (add-years 1999 1)
+ ; (println* &(add-years 1999 1)
 ```
